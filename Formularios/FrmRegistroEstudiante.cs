@@ -26,8 +26,6 @@ namespace RegistroEstudiantes.Formularios
             CargarNacionalidades();
             CargarNivelesAcademicos();
 
-            CargarAreas();
-            CargarDepartamentos();
 
             cboCarrera.DataSource = null;
             cboCarrera.Enabled = false;
@@ -215,7 +213,29 @@ namespace RegistroEstudiantes.Formularios
 
             cboDepartamento.SelectedIndex = -1;
         }
+        private async Task CargarCatalogosInicialesAsync()
+        {
+            Task<List<OpcionCatalogo>> tareaAreas =
+                catalogoRepository.ListarAreasAsync();
 
+            Task<List<OpcionCatalogo>> tareaDepartamentos =
+                catalogoRepository.ListarDepartamentosAsync();
+
+            List<OpcionCatalogo>[] resultados =
+                await Task.WhenAll(
+                    tareaAreas,
+                    tareaDepartamentos);
+
+            cboArea.DisplayMember = "Nombre";
+            cboArea.ValueMember = "Id";
+            cboArea.DataSource = resultados[0];
+            cboArea.SelectedIndex = -1;
+
+            cboDepartamento.DisplayMember = "Nombre";
+            cboDepartamento.ValueMember = "Id";
+            cboDepartamento.DataSource = resultados[1];
+            cboDepartamento.SelectedIndex = -1;
+        }
         private void CargarMunicipios(int idDepartamento)
         {
             List<OpcionCatalogo> municipios =
@@ -607,6 +627,11 @@ namespace RegistroEstudiantes.Formularios
             {
                 cboMunicipio.DataSource = null;
             }
+        }
+
+        private async void FrmRegistroEstudiante_Load(object sender, EventArgs e)
+        {
+            await CargarCatalogosInicialesAsync();
         }
     }
 }

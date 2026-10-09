@@ -81,8 +81,39 @@ namespace RegistroEstudiantes.Datos
 
                 return lista;
             }
+        public async Task<List<OpcionCatalogo>> ListarDepartamentosAsync()
+        {
+            const string sql = @"
+    SELECT IdDepartamento, Nombre
+    FROM Departamentos
+    ORDER BY Nombre;";
 
-            public List<OpcionCatalogo> ListarMunicipios(
+            List<OpcionCatalogo> lista = new();
+
+            using SqlConnection conexion =
+                ConexionBD.CrearConexion();
+
+            using SqlCommand comando =
+                new(sql, conexion);
+
+            await conexion.OpenAsync();
+
+            using SqlDataReader lector =
+                await comando.ExecuteReaderAsync();
+
+            while (await lector.ReadAsync())
+            {
+                lista.Add(new OpcionCatalogo
+                {
+                    Id = lector.GetInt32(0),
+                    Nombre = lector.GetString(1)
+                });
+            }
+
+            return lista;
+        }
+
+        public List<OpcionCatalogo> ListarMunicipios(
                 int idDepartamento)
             {
                 const string sql = @"
@@ -140,6 +171,37 @@ namespace RegistroEstudiantes.Datos
                 comando.ExecuteReader();
 
             while (lector.Read())
+            {
+                lista.Add(new OpcionCatalogo
+                {
+                    Id = lector.GetInt32(0),
+                    Nombre = lector.GetString(1)
+                });
+            }
+
+            return lista;
+        }
+        public async Task<List<OpcionCatalogo>> ListarAreasAsync()
+        {
+            const string sql = @"
+SELECT IdArea, Nombre
+FROM AreasConocimiento
+ORDER BY Nombre;";
+
+            List<OpcionCatalogo> lista = new();
+
+            using SqlConnection conexion =
+                ConexionBD.CrearConexion();
+
+            using SqlCommand comando =
+                new(sql, conexion);
+
+            await conexion.OpenAsync();
+
+            using SqlDataReader lector =
+                await comando.ExecuteReaderAsync();
+
+            while (await lector.ReadAsync())
             {
                 lista.Add(new OpcionCatalogo
                 {

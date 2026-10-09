@@ -41,6 +41,13 @@
             txtBuscar = new TextBox();
             btnEditar = new Button();
             btnDesactivar = new Button();
+            btnProcesarBloqueante = new Button();
+            btnProcesar = new Button();
+            btnCancelar = new Button();
+            prgProceso = new ProgressBar();
+            lblEstado = new Label();
+            txtLog = new TextBox();
+            btnProbarParalelo = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvEstudiantes).BeginInit();
             SuspendLayout();
             // 
@@ -48,13 +55,14 @@
             // 
             dgvEstudiantes.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvEstudiantes.Columns.AddRange(new DataGridViewColumn[] { Carnet, Nombrecompleto, Sexo, Carrera, Nivel, Correo, Promedio });
-            dgvEstudiantes.Location = new Point(0, 0);
+            dgvEstudiantes.Location = new Point(0, 11);
+            dgvEstudiantes.Margin = new Padding(3, 2, 3, 2);
             dgvEstudiantes.MultiSelect = false;
             dgvEstudiantes.Name = "dgvEstudiantes";
             dgvEstudiantes.ReadOnly = true;
             dgvEstudiantes.RowHeadersWidth = 51;
             dgvEstudiantes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvEstudiantes.Size = new Size(800, 412);
+            dgvEstudiantes.Size = new Size(700, 309);
             dgvEstudiantes.TabIndex = 0;
             // 
             // Carnet
@@ -115,9 +123,10 @@
             // 
             // btnVerDetalle
             // 
-            btnVerDetalle.Location = new Point(0, 418);
+            btnVerDetalle.Location = new Point(0, 329);
+            btnVerDetalle.Margin = new Padding(3, 2, 3, 2);
             btnVerDetalle.Name = "btnVerDetalle";
-            btnVerDetalle.Size = new Size(218, 36);
+            btnVerDetalle.Size = new Size(191, 27);
             btnVerDetalle.TabIndex = 1;
             btnVerDetalle.Text = "Detalle";
             btnVerDetalle.UseVisualStyleBackColor = true;
@@ -125,9 +134,10 @@
             // 
             // btnBuscar
             // 
-            btnBuscar.Location = new Point(224, 418);
+            btnBuscar.Location = new Point(197, 329);
+            btnBuscar.Margin = new Padding(3, 2, 3, 2);
             btnBuscar.Name = "btnBuscar";
-            btnBuscar.Size = new Size(218, 36);
+            btnBuscar.Size = new Size(191, 27);
             btnBuscar.TabIndex = 2;
             btnBuscar.Text = "Buscar";
             btnBuscar.UseVisualStyleBackColor = true;
@@ -135,16 +145,18 @@
             // 
             // txtBuscar
             // 
-            txtBuscar.Location = new Point(470, 423);
+            txtBuscar.Location = new Point(394, 332);
+            txtBuscar.Margin = new Padding(3, 2, 3, 2);
             txtBuscar.Name = "txtBuscar";
-            txtBuscar.Size = new Size(181, 27);
+            txtBuscar.Size = new Size(188, 23);
             txtBuscar.TabIndex = 3;
             // 
             // btnEditar
             // 
-            btnEditar.Location = new Point(0, 478);
+            btnEditar.Location = new Point(0, 371);
+            btnEditar.Margin = new Padding(3, 2, 3, 2);
             btnEditar.Name = "btnEditar";
-            btnEditar.Size = new Size(218, 36);
+            btnEditar.Size = new Size(191, 27);
             btnEditar.TabIndex = 4;
             btnEditar.Text = "Editar";
             btnEditar.UseVisualStyleBackColor = true;
@@ -152,27 +164,101 @@
             // 
             // btnDesactivar
             // 
-            btnDesactivar.Location = new Point(224, 478);
+            btnDesactivar.Location = new Point(197, 371);
+            btnDesactivar.Margin = new Padding(3, 2, 3, 2);
             btnDesactivar.Name = "btnDesactivar";
-            btnDesactivar.Size = new Size(218, 36);
+            btnDesactivar.Size = new Size(191, 27);
             btnDesactivar.TabIndex = 5;
             btnDesactivar.Text = "Desactivar";
             btnDesactivar.UseVisualStyleBackColor = true;
             btnDesactivar.Click += btnDesactivar_Click;
             // 
+            // btnProcesarBloqueante
+            // 
+            btnProcesarBloqueante.Location = new Point(0, 410);
+            btnProcesarBloqueante.Name = "btnProcesarBloqueante";
+            btnProcesarBloqueante.Size = new Size(191, 26);
+            btnProcesarBloqueante.TabIndex = 6;
+            btnProcesarBloqueante.Text = "Bloquear";
+            btnProcesarBloqueante.UseVisualStyleBackColor = true;
+            btnProcesarBloqueante.Click += btnProcesarBloqueante_Click;
+            // 
+            // btnProcesar
+            // 
+            btnProcesar.Location = new Point(196, 410);
+            btnProcesar.Name = "btnProcesar";
+            btnProcesar.Size = new Size(191, 26);
+            btnProcesar.TabIndex = 7;
+            btnProcesar.Text = "Proceso";
+            btnProcesar.UseVisualStyleBackColor = true;
+            btnProcesar.Click += btnProcesar_Click;
+            // 
+            // btnCancelar
+            // 
+            btnCancelar.Location = new Point(394, 371);
+            btnCancelar.Name = "btnCancelar";
+            btnCancelar.Size = new Size(191, 26);
+            btnCancelar.TabIndex = 8;
+            btnCancelar.Text = "Cancelar";
+            btnCancelar.UseVisualStyleBackColor = true;
+            btnCancelar.Click += btnCancelar_Click;
+            // 
+            // prgProceso
+            // 
+            prgProceso.Location = new Point(27, 455);
+            prgProceso.Name = "prgProceso";
+            prgProceso.Size = new Size(361, 23);
+            prgProceso.TabIndex = 9;
+            // 
+            // lblEstado
+            // 
+            lblEstado.AutoSize = true;
+            lblEstado.Location = new Point(423, 463);
+            lblEstado.Name = "lblEstado";
+            lblEstado.Size = new Size(38, 15);
+            lblEstado.TabIndex = 10;
+            lblEstado.Text = "label1";
+            // 
+            // txtLog
+            // 
+            txtLog.Location = new Point(394, 413);
+            txtLog.Multiline = true;
+            txtLog.Name = "txtLog";
+            txtLog.Size = new Size(188, 23);
+            txtLog.TabIndex = 11;
+            // 
+            // btnProbarParalelo
+            // 
+            btnProbarParalelo.Location = new Point(599, 331);
+            btnProbarParalelo.Name = "btnProbarParalelo";
+            btnProbarParalelo.Size = new Size(89, 23);
+            btnProbarParalelo.TabIndex = 12;
+            btnProbarParalelo.Text = "Probar";
+            btnProbarParalelo.UseVisualStyleBackColor = true;
+            btnProbarParalelo.Click += btnProbarParalelo_Click;
+            // 
             // FrmListaEstudiantes
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 555);
+            ClientSize = new Size(700, 501);
+            Controls.Add(btnProbarParalelo);
+            Controls.Add(txtLog);
+            Controls.Add(lblEstado);
+            Controls.Add(prgProceso);
+            Controls.Add(btnCancelar);
+            Controls.Add(btnProcesar);
+            Controls.Add(btnProcesarBloqueante);
             Controls.Add(btnDesactivar);
             Controls.Add(btnEditar);
             Controls.Add(txtBuscar);
             Controls.Add(btnBuscar);
             Controls.Add(btnVerDetalle);
             Controls.Add(dgvEstudiantes);
+            Margin = new Padding(3, 2, 3, 2);
             Name = "FrmListaEstudiantes";
             Text = "FrmListaEstudiantes";
+            Load += FrmListaEstudiantes_Load;
             ((System.ComponentModel.ISupportInitialize)dgvEstudiantes).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -193,5 +279,12 @@
         private TextBox txtBuscar;
         private Button btnEditar;
         private Button btnDesactivar;
+        private Button btnProcesarBloqueante;
+        private Button btnProcesar;
+        private Button btnCancelar;
+        private ProgressBar prgProceso;
+        private Label lblEstado;
+        private TextBox txtLog;
+        private Button btnProbarParalelo;
     }
 }

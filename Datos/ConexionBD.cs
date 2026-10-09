@@ -10,7 +10,7 @@ namespace RegistroEstudiantes.Datos
     public static class ConexionBD
     {
         private const string CadenaConexion =
-            "Server=DESKTOP-F0HIFN6\\SQLSERVER2019;" +
+            "Server=(localdb)\\MSSQLLocalDB;" +
             "Database=RegistroEstudiantesDB;" +
             "Trusted_Connection=True;" +
             "TrustServerCertificate=True;";

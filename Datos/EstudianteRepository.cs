@@ -215,6 +215,216 @@ namespace RegistroEstudiantes.Datos
 
             return lista;
         }
+        public async Task<List<Estudiante>> BuscarAsync(
+string texto,
+CancellationToken token = default)
+        {
+            const string sql = @"
+    SELECT 
+        e.Id,
+        e.Carnet,
+        e.Cedula,
+        e.Nombres,
+        e.Apellidos,
+        e.Sexo,
+        e.FechaNacimiento,
+        e.Nacionalidad,
+        e.NivelAcademico,
+        e.TieneTutor,
+
+        e.IdCarrera,
+        c.Nombre AS Carrera,
+        a.Nombre AS Area,
+        e.IdMunicipio,
+        m.Nombre AS Municipio,
+        d.Nombre AS Departamento,
+
+        e.Etnia,
+        e.Correo,
+        e.Promedio,
+        e.TieneDiscapacidadFisica,
+        e.DescripcionDiscapacidad,
+        e.EsInterno,
+        e.Activo
+
+    FROM Estudiantes e
+
+    INNER JOIN Carreras c
+        ON c.IdCarrera = e.IdCarrera
+
+    INNER JOIN AreasConocimiento a
+        ON a.IdArea = c.IdArea
+
+    INNER JOIN Municipios m
+        ON m.IdMunicipio = e.IdMunicipio
+
+    INNER JOIN Departamentos d
+        ON d.IdDepartamento = m.IdDepartamento
+
+    WHERE e.Activo = 1
+
+    AND (
+        e.Carnet LIKE @Texto
+        OR e.Nombres LIKE @Texto
+        OR e.Apellidos LIKE @Texto
+    )
+
+    ORDER BY e.Apellidos, e.Nombres;
+";
+
+            List<Estudiante> lista = new();
+
+            using SqlConnection conexion =
+                ConexionBD.CrearConexion();
+
+            using SqlCommand comando =
+                new(sql, conexion);
+
+            comando.Parameters.AddWithValue(
+                "@Texto",
+                $"%{texto.Trim()}%");
+
+            await conexion.OpenAsync(token);
+
+            using SqlDataReader lector =
+                await comando.ExecuteReaderAsync(token);
+
+            while (await lector.ReadAsync(token))
+            {
+                token.ThrowIfCancellationRequested();
+
+                lista.Add(MapearEstudiante(lector));
+            }
+
+            return lista;
+        }
+        private Estudiante MapearEstudiante(SqlDataReader lector)
+        {
+            string nombreArea =
+                lector.GetString(
+                    lector.GetOrdinal("Area"));
+
+            AreaConocimiento area;
+
+            if (!Enum.TryParse(
+                    nombreArea,
+                    true,
+                    out area))
+            {
+                area = AreaConocimiento.Otra;
+            }
+
+            return new Estudiante
+            {
+                Id = lector.GetGuid(
+                    lector.GetOrdinal("Id")),
+
+                Carnet = lector.GetString(
+                    lector.GetOrdinal("Carnet")),
+
+                Cedula = lector.IsDBNull(
+                    lector.GetOrdinal("Cedula"))
+                    ? string.Empty
+                    : lector.GetString(
+                        lector.GetOrdinal("Cedula")),
+
+                Nombres = lector.GetString(
+                    lector.GetOrdinal("Nombres")),
+
+                Apellidos = lector.GetString(
+                    lector.GetOrdinal("Apellidos")),
+
+                Sexo = Enum.Parse<Sexo>(
+                    lector.GetString(
+                        lector.GetOrdinal("Sexo"))),
+
+                FechaNacimiento =
+                    lector.GetDateTime(
+                        lector.GetOrdinal(
+                            "FechaNacimiento")),
+
+                Nacionalidad =
+                    lector.GetString(
+                        lector.GetOrdinal(
+                            "Nacionalidad")),
+
+                NivelAcademico =
+                    lector.GetString(
+                        lector.GetOrdinal(
+                            "NivelAcademico")),
+
+                TieneTutor =
+                    lector.GetBoolean(
+                        lector.GetOrdinal(
+                            "TieneTutor")),
+
+                IdCarrera =
+                    lector.GetInt32(
+                        lector.GetOrdinal(
+                            "IdCarrera")),
+
+                Carrera =
+                    lector.GetString(
+                        lector.GetOrdinal(
+                            "Carrera")),
+
+                AreaConocimiento = area,
+
+                IdMunicipio =
+                    lector.GetInt32(
+                        lector.GetOrdinal(
+                            "IdMunicipio")),
+
+                Municipio =
+                    lector.GetString(
+                        lector.GetOrdinal(
+                            "Municipio")),
+
+                Departamento =
+                    lector.GetString(
+                        lector.GetOrdinal(
+                            "Departamento")),
+
+                Etnia = lector.IsDBNull(
+                    lector.GetOrdinal("Etnia"))
+                    ? string.Empty
+                    : lector.GetString(
+                        lector.GetOrdinal("Etnia")),
+
+                Correo =
+                    lector.GetString(
+                        lector.GetOrdinal("Correo")),
+
+                Promedio =
+                    lector.GetDecimal(
+                        lector.GetOrdinal(
+                            "Promedio")),
+
+                TieneDiscapacidadFisica =
+                    lector.GetBoolean(
+                        lector.GetOrdinal(
+                            "TieneDiscapacidadFisica")),
+
+                DescripcionDiscapacidad =
+                    lector.IsDBNull(
+                        lector.GetOrdinal(
+                            "DescripcionDiscapacidad"))
+                    ? string.Empty
+                    : lector.GetString(
+                        lector.GetOrdinal(
+                            "DescripcionDiscapacidad")),
+
+                EsInterno =
+                    lector.GetBoolean(
+                        lector.GetOrdinal(
+                            "EsInterno")),
+
+                Activo =
+                    lector.GetBoolean(
+                        lector.GetOrdinal(
+                            "Activo"))
+            };
+        }
         public bool ExisteCarnet(string carnet)
         {
             const string sql = "SELECT COUNT(*) FROM Estudiantes WHERE Carnet = @Carnet;";
@@ -596,6 +806,103 @@ namespace RegistroEstudiantes.Datos
             conexion.Open();
             comando.ExecuteNonQuery();
         }
+        public async Task DesactivarAsync(
+    Guid id,
+    CancellationToken token = default)
+        {
+            const string sql = @"
+        UPDATE Estudiantes
+        SET Activo = 0
+        WHERE Id = @Id;";
+
+            using SqlConnection conexion =
+                ConexionBD.CrearConexion();
+
+            using SqlCommand comando =
+                new(sql, conexion);
+
+            comando.Parameters.AddWithValue("@Id", id);
+
+            await conexion.OpenAsync(token);
+
+            await comando.ExecuteNonQueryAsync(token);
+        }
+
+        public async Task<List<Estudiante>> ListarAsync(
+    CancellationToken token = default)
+        {
+            const string sql = @"
+        SELECT
+            e.Id,
+            e.Carnet,
+            e.Cedula,
+            e.Nombres,
+            e.Apellidos,
+            e.Sexo,
+            e.FechaNacimiento,
+            e.Nacionalidad,
+            e.NivelAcademico,
+            e.TieneTutor,
+
+            e.IdCarrera,
+            c.Nombre AS Carrera,
+            a.Nombre AS Area,
+            e.IdMunicipio,
+            m.Nombre AS Municipio,
+            d.Nombre AS Departamento,
+
+            e.Etnia,
+            e.Correo,
+            e.Promedio,
+            e.TieneDiscapacidadFisica,
+            e.DescripcionDiscapacidad,
+            e.EsInterno,
+            e.Activo
+
+        FROM Estudiantes e
+
+        INNER JOIN Carreras c
+            ON c.IdCarrera = e.IdCarrera
+
+        INNER JOIN AreasConocimiento a
+            ON a.IdArea = c.IdArea
+
+        INNER JOIN Municipios m
+            ON m.IdMunicipio = e.IdMunicipio
+
+        INNER JOIN Departamentos d
+            ON d.IdDepartamento = m.IdDepartamento
+
+        WHERE e.Activo = 1
+
+        ORDER BY e.Apellidos, e.Nombres;
+    ";
+
+            List<Estudiante> lista = new();
+
+            using SqlConnection conexion =
+                ConexionBD.CrearConexion();
+
+            using SqlCommand comando =
+                new(sql, conexion);
+
+            await conexion.OpenAsync(token);
+
+            using SqlDataReader lector =
+                await comando.ExecuteReaderAsync(token);
+
+            while (await lector.ReadAsync(token))
+            {
+                token.ThrowIfCancellationRequested();
+
+                lista.Add(MapearEstudiante(lector));
+            }
+
+            return lista;
+        }
+
+
+
 
 
     }
